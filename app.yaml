@@ -1,0 +1,37 @@
+---
+name: X光肺炎
+author: jiayi
+description: X光肺炎
+topic: X光肺炎
+algorithm: CNN
+language: Python3
+
+framework: Keras
+
+data:
+  id: ChestXray02
+  name: X光肺炎
+  category: image
+
+model:
+  processor: Processor
+  input_x: input_x
+  output_x: input_x
+  input_y: input_y
+  output_y: output_y
+  input:
+    columns:
+      - name: image_path
+        type: url
+    to_type: float
+    to_shape: [-1,224,224,3]
+  output:
+    columns:
+      - name: labels
+        type: int
+    to_type: int
+    to_shape: [4]
+servers:
+  - id: flyai
+    url: https://www.flyai.com
+...

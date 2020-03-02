@@ -1,0 +1,8 @@
+flyai
+numpy
+opencv-python
+matplotlib
+scipy
+Pillow==6.2.2
+tensorflow==1.14.0
+keras==2.2.5
