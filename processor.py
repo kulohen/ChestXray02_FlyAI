@@ -21,7 +21,7 @@ class Processor(Base):
     def input_x(self, image_path):
         path = check_download(image_path, DATA_PATH)
         image = cv2.imread(path)
-        image = cv2.resize(image, (224, 224), interpolation=cv2.INTER_CUBIC)
+        # image = cv2.resize(image, (224, 224), interpolation=cv2.INTER_CUBIC)
         x_data = numpy.array(image)
         x_data = x_data.astype(numpy.float32)
         x_data = numpy.multiply(x_data, 1.0 / 255.0)
@@ -36,7 +36,7 @@ class Processor(Base):
     def output_x(self, image_path):
         path = check_download(image_path, DATA_PATH)
         image = cv2.imread(path)
-        image = cv2.resize(image, (224, 224), interpolation=cv2.INTER_CUBIC)
+        # image = cv2.resize(image, (224, 224), interpolation=cv2.INTER_CUBIC)
         x_data = numpy.array(image)
         x_data = x_data.astype(numpy.float32)
         x_data = numpy.multiply(x_data, 1.0 / 255.0)

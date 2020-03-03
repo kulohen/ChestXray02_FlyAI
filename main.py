@@ -101,7 +101,7 @@ for epoch in range(train_epoch):
         continue
     # 采用数据增强ImageDataGenerator
     datagen = ImageDataGenerator(
-        rotation_range=30,
+        # rotation_range=30,
         width_shift_range=0.1,
         height_shift_range=0.1,
         # shear_range=0.1,
