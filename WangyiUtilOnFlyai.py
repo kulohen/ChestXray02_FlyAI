@@ -116,10 +116,13 @@ class OptimizerByWangyi():
 
 def readCustomCsv_V3(train_csv_url, test_csv_url):
     # 2019-08-29 flyai改版本了，这是为了适应
+    # source_csv = Csv({'train_url': os.path.join(DATA_PATH, train_csv_url),
+    #                                        'test_url': os.path.join(DATA_PATH, test_csv_url)})
 
+    # 2020-3-3 flyai改版本了，这是为了适应
+    source_csv = Csv({'train_url': train_csv_url,
+                                           'test_url': test_csv_url})
 
-    source_csv = Csv({'train_url': os.path.join(DATA_PATH, train_csv_url),
-                                           'test_url': os.path.join(DATA_PATH, test_csv_url)})
     return source_csv
 
 
@@ -201,12 +204,14 @@ def get_sliceCSVbyClassify_V3(label='labels',classify_count=3, split=0.8):
         a = tmp_c[ : cut_length]
         b = tmp_c[ cut_length : ]
 
-        path_train = os.path.join(DATA_PATH, 'wangyi-train-classfy-' + str(epoch) + '.csv')
-        a.to_csv(path_train,index=False)
+        # path_train = os.path.join(DATA_PATH, 'wangyi-train-classfy-' + str(epoch) + '.csv')
+        path_train = 'wangyi-train-classfy-' + str(epoch) + '.csv'
+        a.to_csv(os.path.join(DATA_PATH, path_train),index=False)
         list_path_train.append(path_train)
 
-        path_test = os.path.join(DATA_PATH, 'wangyi-test-classfy-' + str(epoch) + '.csv')
-        b.to_csv(path_test,index=False)
+        # path_test = os.path.join(DATA_PATH, 'wangyi-test-classfy-' + str(epoch) + '.csv')
+        path_test = 'wangyi-test-classfy-' + str(epoch) + '.csv'
+        b.to_csv(os.path.join(DATA_PATH,path_test) ,index=False)
         list_path_test.append(path_test)
 
         print('classfy-',epoch,' : train and test.csv save OK!')
@@ -351,8 +356,6 @@ def ReadFileNames():
         print(files)  # 当前路径下所有非目录子文件
 
 if __name__=='__main__':
-    ReadFileNames()
-
-    a = OptimizerByWangyi()
-    for _ in range(100):
-        a.get_random_opt()
+    # ReadFileNames()
+    print(os.path.join(DATA_PATH, 'dev.csv'))
+    source_csv = readCustomCsv_V3('dev.csv', 'dev.csv')
