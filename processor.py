@@ -9,7 +9,7 @@ from path import DATA_PATH
 '''
 把样例项目中的processor.py件复制过来替换即可
 '''
-
+img_size = [224, 224]
 
 class Processor(Base):
     '''
