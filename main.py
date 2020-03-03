@@ -38,18 +38,18 @@ Keras模版项目下载： https://www.flyai.com/python/keras_template.zip
 项目的超参
 '''
 parser = argparse.ArgumentParser()
-parser.add_argument("-e", "--EPOCHS", default=5, type=int, help="train epochs")
+parser.add_argument("-e", "--EPOCHS", default=100, type=int, help="train epochs")
 parser.add_argument("-b", "--BATCH", default=8, type=int, help="batch size")
 args = parser.parse_args()
 
 num_classes = 4
 val_batch_size = {
-    0: 32,
-    1: 32,
-    2: 32,
-    3: 32
+    0: 33,
+    1: 17,
+    2: 16,
+    3: 34
 }
-train_epoch = 50
+train_epoch = args.EPOCHS
 history_train = 0
 history_test = 0
 best_score_by_acc = 0.
@@ -83,7 +83,7 @@ model_cnn = Net(num_classes=num_classes).get_Model()
 model_cnn.summary()
 
 model_cnn.compile(loss='categorical_crossentropy',
-              optimizer=wangyi.OptimizerByWangyi().get_create_optimizer(name='rmsprop', lr_num=1e-4),
+              optimizer=wangyi.OptimizerByWangyi().get_create_optimizer(name='adam', lr_num=1e-3),
               metrics=['accuracy']
               )
 
@@ -155,8 +155,8 @@ for epoch in range(train_epoch):
          2.3修改下一个train batch
         '''
         # val-loss 0.7以下不提供batch, 0.7 * 20 =14
-        # next_train_batch_size = int(history_test[0] * 10)
-        next_train_batch_size = int(history_test[0] * val_batch_size[iters])
+        next_train_batch_size = int(history_test[0] * 20)
+        # next_train_batch_size = int(history_test[0] * val_batch_size[iters])
         # next_train_batch_size = history_test[0] + train_allow_loss[iters]
         # next_train_batch_size = int (next_train_batch_size * val_batch_size[iters])
         if next_train_batch_size > 50:
@@ -174,7 +174,7 @@ for epoch in range(train_epoch):
     3/ 保存最佳模型model
     '''
     # save best acc
-    if history_train.history['val_acc'][0] > 0.58 and \
+    if history_train.history['val_acc'][0] > 0.50 and \
             round(best_score_by_loss, 2) >= round(history_train.history['val_loss'][0], 2):
     # if history_train.history['acc'][0] > 0.6 and \
     #         round(best_score_by_acc, 2) <= round(history_train.history['val_acc'][0], 2):
@@ -201,7 +201,7 @@ for epoch in range(train_epoch):
     # 调整学习率，且只执行一次
     if history_train.history['loss'][0] < 1.5 and lr_level == 0:
 
-        tmp_opt = wangyi.OptimizerByWangyi().get_create_optimizer(name='rmsprop', lr_num=3e-5)
+        tmp_opt = wangyi.OptimizerByWangyi().get_create_optimizer(name='rmsprop', lr_num=1e-4)
         lr_level = 1
 
     elif history_train.history['loss'][0] < 1.0 and lr_level == 1:
