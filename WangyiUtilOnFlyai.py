@@ -359,7 +359,7 @@ if __name__=='__main__':
     # ReadFileNames()
     # print(os.path.join(DATA_PATH, 'dev.csv'))
     # source_csv = readCustomCsv_V3('dev.csv', 'dev.csv')
-    dataset = Dataset(epochs=5, batch=8)
+    dataset = Dataset(epochs=5, batch=10)
     x,y = dataset.next_train_batch()
     print(len(x))
     print(x.shape)
