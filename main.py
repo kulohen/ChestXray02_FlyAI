@@ -39,7 +39,7 @@ Keras模版项目下载： https://www.flyai.com/python/keras_template.zip
 '''
 parser = argparse.ArgumentParser()
 parser.add_argument("-e", "--EPOCHS", default=100, type=int, help="train epochs")
-parser.add_argument("-b", "--BATCH", default=10, type=int, help="batch size")
+parser.add_argument("-b", "--BATCH", default=8, type=int, help="batch size")
 args = parser.parse_args()
 
 num_classes = 4
@@ -121,7 +121,7 @@ for epoch in range(train_epoch):
     #                                         batch_size=args.BATCH ,epochs=1,verbose=2
     #                               )
     # print('np.sum(train_batch_List :',np.sum(train_batch_List))
-    for_fit_generator_train_steps = int(np.sum(train_batch_List, axis=0) * 2 / args.BATCH) + 1
+    for_fit_generator_train_steps = int(np.sum(train_batch_List, axis=0) * 2 / args.BATCH)
     print('该epoch的fit_generator steps是 ', for_fit_generator_train_steps)
     history_train = model_cnn.fit_generator(
         generator=data_iter_train,
@@ -153,7 +153,7 @@ for epoch in range(train_epoch):
         sum_acc += history_test[1] * val_batch_size[iters]
         '''
          2.3修改下一个train batch
-        '''
+         
         # val-loss 0.7以下不提供batch, 0.7 * 20 =14
         next_train_batch_size = int(history_test[0] * 20)
         # next_train_batch_size = int(history_test[0] * val_batch_size[iters])
@@ -165,6 +165,13 @@ for epoch in range(train_epoch):
             train_batch_List[iters] = next_train_batch_size= 1
         else:
             train_batch_List[iters] = next_train_batch_size
+         
+        '''
+        train_batch_List = [
+            100,100,100,100
+        ]
+
+
 
     dataset_wangyi.set_Batch_Size(train_batch_List, val_batch_size)
     # sum_loss =sum_loss / np.sum(train_batch_List, axis = 0)
@@ -199,16 +206,16 @@ for epoch in range(train_epoch):
         tmp_opt = wangyi.OptimizerByWangyi().get_random_opt()
 
     # 调整学习率，且只执行一次
-    if history_train.history['loss'][0] < 1.0 and lr_level == 0:
+    if history_train.history['loss'][0] < 0.8 and lr_level == 0:
 
         tmp_opt = wangyi.OptimizerByWangyi().get_create_optimizer(name='adagrad', lr_num=1e-4)
         lr_level = 1
 
-    elif history_train.history['loss'][0] < 0.8 and lr_level == 1:
+    elif history_train.history['loss'][0] < 0.6 and lr_level == 1:
         tmp_opt = wangyi.OptimizerByWangyi().get_create_optimizer(name='sgd', lr_num=1e-5)
         lr_level = 2
 
-    elif history_train.history['loss'][0] < 0.5 and lr_level == 2:
+    elif history_train.history['loss'][0] < 0.3 and lr_level == 2:
         tmp_opt = tmp_opt = wangyi.OptimizerByWangyi().get_create_optimizer(name='sgd', lr_num=1e-4)
         lr_level = 3
 
