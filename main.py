@@ -39,7 +39,7 @@ Keras模版项目下载： https://www.flyai.com/python/keras_template.zip
 '''
 parser = argparse.ArgumentParser()
 parser.add_argument("-e", "--EPOCHS", default=100, type=int, help="train epochs")
-parser.add_argument("-b", "--BATCH", default=8, type=int, help="batch size")
+parser.add_argument("-b", "--BATCH", default=10, type=int, help="batch size")
 args = parser.parse_args()
 
 num_classes = 4
@@ -56,7 +56,7 @@ best_score_by_acc = 0.
 best_score_by_loss = 999.
 lr_level=0
 # 训练集的每类的batch的量，组成的list
-train_batch_List = [10] * num_classes
+train_batch_List = [100] * num_classes
 
 '''
 flyai库中的提供的数据处理方法
@@ -199,20 +199,20 @@ for epoch in range(train_epoch):
         tmp_opt = wangyi.OptimizerByWangyi().get_random_opt()
 
     # 调整学习率，且只执行一次
-    if history_train.history['loss'][0] < 1.5 and lr_level == 0:
+    if history_train.history['loss'][0] < 1.0 and lr_level == 0:
 
-        tmp_opt = wangyi.OptimizerByWangyi().get_create_optimizer(name='rmsprop', lr_num=1e-4)
+        tmp_opt = wangyi.OptimizerByWangyi().get_create_optimizer(name='adagrad', lr_num=1e-4)
         lr_level = 1
 
-    elif history_train.history['loss'][0] < 1.0 and lr_level == 1:
-        tmp_opt = wangyi.OptimizerByWangyi().get_create_optimizer(name='rmsprop', lr_num=1e-5)
+    elif history_train.history['loss'][0] < 0.8 and lr_level == 1:
+        tmp_opt = wangyi.OptimizerByWangyi().get_create_optimizer(name='sgd', lr_num=1e-5)
         lr_level = 2
 
-    elif history_train.history['loss'][0] < 0.8 and lr_level == 2:
-        tmp_opt = tmp_opt = wangyi.OptimizerByWangyi().get_create_optimizer(name='adagrad', lr_num=1e-4)
+    elif history_train.history['loss'][0] < 0.5 and lr_level == 2:
+        tmp_opt = tmp_opt = wangyi.OptimizerByWangyi().get_create_optimizer(name='sgd', lr_num=1e-4)
         lr_level = 3
 
-    elif history_train.history['loss'][0] < 0.4 and lr_level == 3:
+    elif history_train.history['loss'][0] < 0.1 and lr_level == 3:
         tmp_opt = tmp_opt = wangyi.OptimizerByWangyi().get_create_optimizer(name='adagrad', lr_num=1e-5)
         lr_level = 4
 
