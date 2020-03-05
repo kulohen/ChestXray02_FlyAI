@@ -5,6 +5,8 @@ Created on Mon Oct 30 19:44:02 2017
 @author: user
 """
 
+import psutil
+import os
 import argparse
 from time import clock
 from net import Net
@@ -18,6 +20,7 @@ from model import Model
 from path import MODEL_PATH
 import WangyiUtilOnFlyai
 from WangyiUtilOnFlyai import DatasetByWangyi,historyByWangyi,OptimizerByWangyi
+from keras.engine.saving import load_model
 
 import tensorflow as tf
 from keras import backend as K
@@ -44,7 +47,7 @@ Keras模版项目下载： https://www.flyai.com/python/keras_template.zip
 '''
 parser = argparse.ArgumentParser()
 parser.add_argument("-e", "--EPOCHS", default=100, type=int, help="train epochs")
-parser.add_argument("-b", "--BATCH", default=6, type=int, help="batch size")
+parser.add_argument("-b", "--BATCH", default=28, type=int, help="batch size")
 args = parser.parse_args()
 
 num_classes = 4
@@ -139,15 +142,15 @@ for epoch in range(train_epoch):
     history_train_all = myhistory.SetHistory(history_train)
 
     # 每10 epoch 重置了wangyi.dataset，防止内存泄露
-    if epoch % 2 == 1:
-        # dataset_wangyi = DatasetByWangyi(num_classes)
-        # dataset_wangyi.set_Batch_Size(train_batch_List, val_batch_size)
-        # print('重置了wangyi.dataset，防止内存泄露')
-
-        # K.clear_session()
-        # tf.reset_default_graph()
-        # del model_cnn
-        print('重置了K.clear_session()，防止内存泄露')
+    if psutil.virtual_memory().percent > 90:
+        print('内存占用率：', psutil.virtual_memory().percent,'现在启动model_cnn重置')
+        tmp_model_path = os.path.join(os.curdir, 'data', 'output', 'model','reset_model_tmp.h5')
+        model_cnn.save(tmp_model_path)  # creates a HDF5 file 'my_model.h5'
+        del model_cnn  # deletes the existing model
+        model_cnn =load_model(tmp_model_path)
+        print('已重置了del model_cnn，防止内存泄露')
+    elif psutil.virtual_memory().percent > 80:
+        print('内存占用率：', psutil.virtual_memory().percent, '，将在90%重置model_cnn')
 
     sum_loss = 0
     sum_acc = 0
