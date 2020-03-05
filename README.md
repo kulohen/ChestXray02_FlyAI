@@ -19,3 +19,5 @@ X光片检测患者肺炎
 2020-3-3 灰度图片？ channel不能再用3，试试
 
 2020-3-4 image = cv2.imread(path , cv2.COLOR_GRAY2BGR)
+
+2020-3-5 predict to csv 写成了

@@ -10,6 +10,7 @@ Desc:
 
 import os
 from time import clock
+import time
 
 import keras.optimizers as optmzs
 import numpy as np
@@ -20,6 +21,8 @@ from flyai.dataset import Dataset
 
 from flyai.source.base import DATA_PATH
 from flyai.source.csv_source import Csv
+import csv
+from model import Model
 
 
 lr_level = {
@@ -348,6 +351,67 @@ class DatasetByWangyi():
         y_4 = np.concatenate(y_4, axis=0)
         return x_4, y_4 ,x_5, y_5
 
+    def read_predict_Csv(self,filename='model.h5'):
+        PREDICT_DATA_PATH = os.path.join(os.curdir, 'data', 'input','upload.csv')
+        Csvlist = []
+        if os.path.exists(PREDICT_DATA_PATH):
+            print(PREDICT_DATA_PATH)
+        else:
+            print('do not exit')
+        with open(PREDICT_DATA_PATH, 'r') as csvFile:
+            reader = csv.reader(csvFile)
+            headers = next(reader)  # 获得列表对象，包含标题行的信息
+            print(headers)
+
+            for row in reader:  # 循环打印各行内容
+                Csvlist.append(row[0])
+        print('Csvlist.count is ', len(Csvlist))
+        return Csvlist
+
+    #TODO 没实现
+    def write_predict_Csv(self, filename='文件名.csv'):
+        # 1. 创建文件对象
+        f = open(filename, 'w', encoding='utf-8')
+
+        # 2. 基于文件对象构建 csv写入对象
+        csv_writer = csv.writer(f)
+
+        # 3. 构建列表头
+        csv_writer.writerow(["image_path", "labels"])
+
+        # 4. 写入csv文件内容
+        csv_writer.writerow(["l", '18', '男'])
+        csv_writer.writerow(["c", '20', '男'])
+        csv_writer.writerow(["w", '22', '女'])
+
+
+    def predict_to_csv(self):
+        save_file_name = 'upload-by-' + str(time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime())+'.csv')
+        save_file_name = os.path.join(os.curdir, 'data', 'output', save_file_name)
+
+        # 1. 创建文件对象
+        with open(save_file_name, 'w', encoding='utf-8',newline='' "") as f:
+
+
+            # 2. 基于文件对象构建 csv写入对象
+            csv_writer = csv.writer(f)
+
+            # 3. 构建列表头
+            csv_writer.writerow(["image_path", "labels"])
+
+            url_list = self.read_predict_Csv()
+            dataset = Dataset(epochs=5, batch=16)
+            model = Model(dataset)
+            predict_list = []
+            for row in url_list:
+                predict_num = model.predict(image_path=row)
+                # csv_writer.writerow([row, str(predict_num)])
+                # predict_list.append(predict_num)
+                predict_list.append([row,predict_num])
+                print('\r'+str(len(predict_list))+'/'+ str(len(url_list)),end='', flush=True)
+            csv_writer.writerows(predict_list)
+        print('predict_list.count IS ', len(predict_list))
+
 
 def ReadFileNames():
     for root, dirs, files in os.walk(os.getcwd()+'/data/input'):
@@ -356,6 +420,8 @@ def ReadFileNames():
         print(files)  # 当前路径下所有非目录子文件
 
 if __name__=='__main__':
+    dataset_wangyi = DatasetByWangyi(4)
+    dataset_wangyi.predict_to_csv()
     # ReadFileNames()
     # print(os.path.join(DATA_PATH, 'dev.csv'))
     # source_csv = readCustomCsv_V3('dev.csv', 'dev.csv')
