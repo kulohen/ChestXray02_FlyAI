@@ -408,9 +408,13 @@ class DatasetByWangyi():
                 # csv_writer.writerow([row, str(predict_num)])
                 # predict_list.append(predict_num)
                 predict_list.append([row,predict_num])
-                print('\r'+str(len(predict_list))+'/'+ str(len(url_list)),end='', flush=True)
+                # 打印进度条
+                count_now = len(predict_list)
+                count_total = len(url_list)
+                print('\r'+'预测集进度：'+str(count_now)+'/'+ str(count_total),
+                      '----{:.2%}'.format(count_now/count_total),end='', flush=True)
             csv_writer.writerows(predict_list)
-        print('predict_list.count IS ', len(predict_list))
+        print('\n已保存CSV到 ',save_file_name)
 
 
 def ReadFileNames():
