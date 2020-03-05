@@ -7,7 +7,7 @@ Contect : 291255700
 Time    : 2019/7/28 上午9:42
 Desc:
 """
-
+import psutil
 import os
 from time import clock
 import time
@@ -424,13 +424,6 @@ def ReadFileNames():
         print(files)  # 当前路径下所有非目录子文件
 
 if __name__=='__main__':
-    dataset_wangyi = DatasetByWangyi(4)
-    dataset_wangyi.predict_to_csv()
-    # ReadFileNames()
-    # print(os.path.join(DATA_PATH, 'dev.csv'))
-    # source_csv = readCustomCsv_V3('dev.csv', 'dev.csv')
-    dataset = Dataset(epochs=5, batch=10)
-    x,y = dataset.next_train_batch()
-    print(len(x))
-    print(x.shape)
+    if psutil.virtual_memory().percent > 1:
+        print(psutil.virtual_memory().percent)
 

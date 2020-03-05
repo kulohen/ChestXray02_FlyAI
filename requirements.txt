@@ -6,3 +6,4 @@ scipy
 Pillow==6.2.2
 tensorflow-gpu==1.14.0
 keras==2.2.5
+psutil

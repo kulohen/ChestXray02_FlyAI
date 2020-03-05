@@ -3,19 +3,18 @@
   <component name="FacetManager">
     <facet type="google-appengine-python" name="Google App Engine (Python)">
       <configuration>
-        <option name="rootFolder" value="C:\Users\29125\PycharmProjects\ChestXray02_FlyAI" />
+        <option name="rootFolder" value="$MODULE_DIR$" />
         <option name="sdkFolder" value="" />
       </configuration>
     </facet>
   </component>
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$" />
-    <orderEntry type="jdk" jdkName="Python 3.6 (RecIndoorScenes2009_FlyAI)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.6 (CIFAR10_FlyAI)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Google App Engine SDK" level="project" />
   </component>
   <component name="PyDocumentationSettings">
-    <option name="format" value="PLAIN" />
     <option name="myDocStringFormat" value="Plain" />
   </component>
 </module>
