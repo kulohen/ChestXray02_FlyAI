@@ -16,12 +16,7 @@ from keras.models import Sequential
 from keras.preprocessing.image import ImageDataGenerator
 from model import Model
 from path import MODEL_PATH
-import WangyiUtilOnFlyai
-from WangyiUtilOnFlyai import DatasetByWangyi,historyByWangyi,OptimizerByWangyi
-
-import tensorflow as tf
-from keras import backend as K
-
+import WangyiUtilOnFlyai as wangyi
 
 # 导入flyai打印日志函数的库
 from flyai.utils.log_helper import train_log
@@ -69,10 +64,10 @@ flyai库中的提供的数据处理方法
 '''
 dataset = Dataset(epochs=args.EPOCHS, batch=args.BATCH)
 model = Model(dataset)
-# wangyi.ReadFileNames()
-dataset_wangyi = DatasetByWangyi(num_classes)
+wangyi.ReadFileNames()
+dataset_wangyi = wangyi.DatasetByWangyi(num_classes)
 dataset_wangyi.set_Batch_Size(train_batch_List, val_batch_size)
-myhistory = historyByWangyi()
+myhistory = wangyi.historyByWangyi()
 
 
 '''
@@ -88,7 +83,7 @@ model_cnn = Net(num_classes=num_classes).get_Model()
 model_cnn.summary()
 
 model_cnn.compile(loss='categorical_crossentropy',
-              optimizer=OptimizerByWangyi().get_create_optimizer(name='adam', lr_num=1e-3),
+              optimizer=wangyi.OptimizerByWangyi().get_create_optimizer(name='adam', lr_num=1e-3),
               metrics=['accuracy']
               )
 
@@ -139,15 +134,10 @@ for epoch in range(train_epoch):
     history_train_all = myhistory.SetHistory(history_train)
 
     # 每10 epoch 重置了wangyi.dataset，防止内存泄露
-    if epoch % 2 == 1:
-        # dataset_wangyi = DatasetByWangyi(num_classes)
-        # dataset_wangyi.set_Batch_Size(train_batch_List, val_batch_size)
-        # print('重置了wangyi.dataset，防止内存泄露')
-
-        # K.clear_session()
-        # tf.reset_default_graph()
-        # del model_cnn
-        print('重置了K.clear_session()，防止内存泄露')
+    if epoch % 10 == 9:
+        dataset_wangyi = wangyi.DatasetByWangyi(num_classes)
+        dataset_wangyi.set_Batch_Size(train_batch_List, val_batch_size)
+        print('重置了wangyi.dataset，防止内存泄露')
 
     sum_loss = 0
     sum_acc = 0
@@ -219,24 +209,24 @@ for epoch in range(train_epoch):
     if epoch == 0 or epoch==50 or epoch==100 or epoch==150 :
         pass
     elif epoch % 50 ==0:
-        tmp_opt = OptimizerByWangyi().get_random_opt()
+        tmp_opt = wangyi.OptimizerByWangyi().get_random_opt()
 
     # 调整学习率，且只执行一次
     if history_train.history['loss'][0] < 0.8 and lr_level == 0:
 
-        tmp_opt = OptimizerByWangyi().get_create_optimizer(name='adagrad', lr_num=1e-4)
+        tmp_opt = wangyi.OptimizerByWangyi().get_create_optimizer(name='adagrad', lr_num=1e-4)
         lr_level = 1
 
     elif history_train.history['loss'][0] < 0.6 and lr_level == 1:
-        tmp_opt = OptimizerByWangyi().get_create_optimizer(name='sgd', lr_num=1e-5)
+        tmp_opt = wangyi.OptimizerByWangyi().get_create_optimizer(name='sgd', lr_num=1e-5)
         lr_level = 2
 
     elif history_train.history['loss'][0] < 0.3 and lr_level == 2:
-        tmp_opt = tmp_opt = OptimizerByWangyi().get_create_optimizer(name='sgd', lr_num=1e-4)
+        tmp_opt = tmp_opt = wangyi.OptimizerByWangyi().get_create_optimizer(name='sgd', lr_num=1e-4)
         lr_level = 3
 
     elif history_train.history['loss'][0] < 0.1 and lr_level == 3:
-        tmp_opt = tmp_opt = OptimizerByWangyi().get_create_optimizer(name='adagrad', lr_num=1e-5)
+        tmp_opt = tmp_opt = wangyi.OptimizerByWangyi().get_create_optimizer(name='adagrad', lr_num=1e-5)
         lr_level = 4
 
     # 应用新的学习率

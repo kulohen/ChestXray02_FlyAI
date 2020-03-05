@@ -275,8 +275,8 @@ class DatasetByWangyi():
         print('全部分类的flyai dataset 建立成功, 耗时：%.1f 秒' % (clock() - time_0))
 
         # 平衡输出45类数据
-        self.x_3, self.y_3, self.x_4, self.y_4 = [], [], [], []
-        self.x_5, self.y_5 ,self.x_6,self.y_6= {}, {} , {}, {}
+        # self.x_3, self.y_3, self.x_4, self.y_4 = [], [], [], []
+        # self.x_5, self.y_5 ,self.x_6,self.y_6= {}, {} , {}, {}
         self.train_batch_List = []
         self.val_batch_size = {}
 
