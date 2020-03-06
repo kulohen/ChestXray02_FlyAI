@@ -21,7 +21,7 @@ from path import MODEL_PATH
 import WangyiUtilOnFlyai
 from WangyiUtilOnFlyai import DatasetByWangyi,historyByWangyi,OptimizerByWangyi
 from keras.engine.saving import load_model
-
+from model import KERAS_MODEL_NAME
 import tensorflow as tf
 from keras import backend as K
 
@@ -47,7 +47,7 @@ Keras模版项目下载： https://www.flyai.com/python/keras_template.zip
 '''
 parser = argparse.ArgumentParser()
 parser.add_argument("-e", "--EPOCHS", default=100, type=int, help="train epochs")
-parser.add_argument("-b", "--BATCH", default=32, type=int, help="batch size")
+parser.add_argument("-b", "--BATCH", default=40, type=int, help="batch size")
 args = parser.parse_args()
 
 num_classes = 4
@@ -77,6 +77,13 @@ dataset_wangyi = DatasetByWangyi(num_classes)
 dataset_wangyi.set_Batch_Size(train_batch_List, val_batch_size)
 myhistory = historyByWangyi()
 
+'''
+清理h5文件
+'''
+model_path = os.path.join(MODEL_PATH, KERAS_MODEL_NAME)
+if os.path.exists(model_path):
+    print(model_path,' 已清理')
+    os.remove(model_path)
 
 '''
 实现自己的网络机构
@@ -198,7 +205,7 @@ for epoch in range(train_epoch):
             round(best_score_by_loss, 2) >= round(history_train.history['val_loss'][0], 2):
     # if history_train.history['acc'][0] > 0.6 and \
     #         round(best_score_by_acc, 2) <= round(history_train.history['val_acc'][0], 2):
-        model.save_model(model=model_cnn, path=MODEL_PATH, overwrite=True)
+        model.save_model(model=model_cnn.model_cnn, path=MODEL_PATH, overwrite=True)
         best_score_by_acc = history_train.history['val_acc'][0]
         best_score_by_loss = history_train.history['val_loss'][0]
         print('【保存】了最佳模型by val_loss : %.4f' % best_score_by_loss)
