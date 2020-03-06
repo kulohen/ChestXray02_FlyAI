@@ -47,15 +47,15 @@ Keras模版项目下载： https://www.flyai.com/python/keras_template.zip
 '''
 parser = argparse.ArgumentParser()
 parser.add_argument("-e", "--EPOCHS", default=100, type=int, help="train epochs")
-parser.add_argument("-b", "--BATCH", default=28, type=int, help="batch size")
+parser.add_argument("-b", "--BATCH", default=6, type=int, help="batch size")
 args = parser.parse_args()
 
 num_classes = 4
 val_batch_size = {
-    0: 33,
-    1: 17,
-    2: 16,
-    3: 34
+    0: 65,
+    1: 35,
+    2: 33,
+    3: 67
 }
 train_epoch = args.EPOCHS
 history_train = 0
@@ -83,14 +83,14 @@ myhistory = historyByWangyi()
 '''
 time_0 = clock()
 # 创建最终模型
-
-model_cnn = Net(num_classes=num_classes).get_Model()
+model_cnn = Net(num_classes=num_classes)
+# model_cnn = my_net.get_Model()
 # model_cnn = keras_model(inputs=Inp, outputs=predictions)
 
 # 输出模型的整体信息
-model_cnn.summary()
+model_cnn.model_cnn.summary()
 
-model_cnn.compile(loss='categorical_crossentropy',
+model_cnn.model_cnn.compile(loss='categorical_crossentropy',
               optimizer=OptimizerByWangyi().get_create_optimizer(name='adam', lr_num=1e-3),
               metrics=['accuracy']
               )
@@ -131,7 +131,7 @@ for epoch in range(train_epoch):
     # print('np.sum(train_batch_List :',np.sum(train_batch_List))
     for_fit_generator_train_steps = int(np.sum(train_batch_List, axis=0) * 2 / args.BATCH)
     print('该epoch的fit_generator steps是 ', for_fit_generator_train_steps)
-    history_train = model_cnn.fit_generator(
+    history_train = model_cnn.get_Model().fit_generator(
         generator=data_iter_train,
         steps_per_epoch=for_fit_generator_train_steps,
         validation_data=(x_4, y_4),
@@ -141,16 +141,10 @@ for epoch in range(train_epoch):
     )
     history_train_all = myhistory.SetHistory(history_train)
 
-    # 每10 epoch 重置了wangyi.dataset，防止内存泄露
-    if psutil.virtual_memory().percent > 90:
-        print('内存占用率：', psutil.virtual_memory().percent,'现在启动model_cnn重置')
-        tmp_model_path = os.path.join(os.curdir, 'data', 'output', 'model','reset_model_tmp.h5')
-        model_cnn.save(tmp_model_path)  # creates a HDF5 file 'my_model.h5'
-        del model_cnn  # deletes the existing model
-        model_cnn =load_model(tmp_model_path)
-        print('已重置了del model_cnn，防止内存泄露')
-    elif psutil.virtual_memory().percent > 80:
-        print('内存占用率：', psutil.virtual_memory().percent, '，将在90%重置model_cnn')
+
+    # 内存超90%重置keras model，防止内存泄露
+    model_cnn.cleanMemory()
+
 
     sum_loss = 0
     sum_acc = 0
@@ -158,7 +152,7 @@ for epoch in range(train_epoch):
         if dataset_wangyi.dataset_slice[iters].get_train_length() == 0 or dataset_wangyi.dataset_slice[
             iters].get_validation_length() == 0:
             continue
-        history_test = model_cnn.evaluate(
+        history_test = model_cnn.model_cnn.evaluate(
             x=x_5[iters],
             y=y_5[iters],
             batch_size=None,
@@ -212,39 +206,15 @@ for epoch in range(train_epoch):
 
     # 调用系统打印日志函数，这样在线上可看到训练和校验准确率和损失的实时变化曲线
     # train_log(train_loss=history_train.history['loss'][0], train_acc=history_train.history['acc'][0], val_loss=history_train.history['val_loss'][0], val_acc=history_train.history['val_acc'][0])
-    # train_log(train_loss=train_loss, train_acc=train_acc, val_acc=val_acc)
-    # train_log(train_loss=loss.item(), train_acc=train_accuracy)
 
     '''
     4/ 调整学习率和优化模型
     '''
-    tmp_opt = None
-    if epoch == 0 or epoch==50 or epoch==100 or epoch==150 :
-        pass
-    elif epoch % 50 ==0:
-        tmp_opt = OptimizerByWangyi().get_random_opt()
-
-    # 调整学习率，且只执行一次
-    if history_train.history['loss'][0] < 0.8 and lr_level == 0:
-
-        tmp_opt = OptimizerByWangyi().get_create_optimizer(name='adagrad', lr_num=1e-4)
-        lr_level = 1
-
-    elif history_train.history['loss'][0] < 0.6 and lr_level == 1:
-        tmp_opt = OptimizerByWangyi().get_create_optimizer(name='sgd', lr_num=1e-5)
-        lr_level = 2
-
-    elif history_train.history['loss'][0] < 0.3 and lr_level == 2:
-        tmp_opt = tmp_opt = OptimizerByWangyi().get_create_optimizer(name='sgd', lr_num=1e-4)
-        lr_level = 3
-
-    elif history_train.history['loss'][0] < 0.1 and lr_level == 3:
-        tmp_opt = tmp_opt = OptimizerByWangyi().get_create_optimizer(name='adagrad', lr_num=1e-5)
-        lr_level = 4
+    tmp_opt = OptimizerByWangyi().reduce_lr_by_loss_and_epoch(history_train.history['loss'][0],epoch)
 
     # 应用新的学习率
     if tmp_opt is not None:
-        model_cnn.compile(loss='categorical_crossentropy',
+        model_cnn.model_cnn.compile(loss='categorical_crossentropy',
                           optimizer=tmp_opt,
                           metrics=['accuracy'])
 
