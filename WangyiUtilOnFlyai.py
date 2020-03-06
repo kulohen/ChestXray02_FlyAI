@@ -55,6 +55,7 @@ class OptimizerByWangyi():
         self.optimizer_iterator = 0
         self.lr_iterator = 0
         self.pationce_count = 0
+        self.lr_level=0 #在训练时判断后+1 使用
 
     def get_create_optimizer(self,name=None,lr_num=0):
         if name is None or lr_num<=0:
@@ -114,8 +115,32 @@ class OptimizerByWangyi():
         print('启动随机de学习率')
         return self.get_create_optimizer(optimizer_level[name] , lr_level[lr])
 
+    def reduce_lr_by_loss_and_epoch(self,get_loss,get_epoch):
+        tmp_opt = None
+        if get_epoch == 0 or get_epoch == 50 or get_epoch == 100 or get_epoch == 150:
+            pass
+        elif get_epoch % 50 == 0:
+            tmp_opt = self.get_random_opt()
 
+        # 调整学习率，且只执行一次
+        if get_loss < 0.8 and self.lr_level == 0:
 
+            tmp_opt = self.get_create_optimizer(name='adagrad', lr_num=1e-4)
+            self.lr_level = 1
+
+        elif get_loss < 0.6 and self.lr_level == 1:
+            tmp_opt = self.get_create_optimizer(name='sgd', lr_num=1e-5)
+            self.lr_level = 2
+
+        elif get_loss < 0.3 and self.lr_level == 2:
+            tmp_opt = self.get_create_optimizer(name='sgd', lr_num=1e-4)
+            self.lr_level = 3
+
+        elif get_loss < 0.1 and self.lr_level == 3:
+            tmp_opt = self.get_create_optimizer(name='adagrad', lr_num=1e-5)
+            self.lr_level = 4
+
+        return tmp_opt
 
 def readCustomCsv_V3(train_csv_url, test_csv_url):
     # 2019-08-29 flyai改版本了，这是为了适应

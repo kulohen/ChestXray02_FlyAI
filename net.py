@@ -6,6 +6,9 @@ from keras.callbacks import EarlyStopping, TensorBoard,ModelCheckpoint,ReduceLRO
 from keras.optimizers import SGD,Adam,RMSprop
 from processor import img_size
 from flyai.utils import remote_helper
+import psutil
+import os
+from keras.engine.saving import load_model
 
 class Net():
 
@@ -68,6 +71,16 @@ class Net():
     def get_Model(self):
         return self.model_cnn
 
+    def cleanMemory(self):
+        if psutil.virtual_memory().percent > 90:
+            print('内存占用率：', psutil.virtual_memory().percent, '现在启动model_cnn重置')
+            tmp_model_path = os.path.join(os.curdir, 'data', 'output', 'model', 'reset_model_tmp.h5')
+            self.model_cnn.save(tmp_model_path)  # creates a HDF5 file 'my_model.h5'
+            del self.model_cnn  # deletes the existing model
+            self.model_cnn = load_model(tmp_model_path)
+            print('已重置了del model_cnn，防止内存泄露')
+        elif psutil.virtual_memory().percent > 80:
+            print('内存占用率：', psutil.virtual_memory().percent, '%，将在90%重置model_cnn')
 
 if __name__=='__main__':
     Net().get_Model().summary()
