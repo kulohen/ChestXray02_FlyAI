@@ -452,3 +452,4 @@ if __name__=='__main__':
     if psutil.virtual_memory().percent > 1:
         print(psutil.virtual_memory().percent)
 
+    DatasetByWangyi(4).predict_to_csv()
