@@ -24,7 +24,7 @@ from keras.engine.saving import load_model
 from model import KERAS_MODEL_NAME
 import tensorflow as tf
 from keras import backend as K
-
+import matplotlib.pyplot as plt
 
 # 导入flyai打印日志函数的库
 from flyai.utils.log_helper import train_log
@@ -46,8 +46,8 @@ Keras模版项目下载： https://www.flyai.com/python/keras_template.zip
 项目的超参
 '''
 parser = argparse.ArgumentParser()
-parser.add_argument("-e", "--EPOCHS", default=100, type=int, help="train epochs")
-parser.add_argument("-b", "--BATCH", default=40, type=int, help="batch size")
+parser.add_argument("-e", "--EPOCHS", default=300, type=int, help="train epochs")
+parser.add_argument("-b", "--BATCH", default=24, type=int, help="batch size")
 args = parser.parse_args()
 
 num_classes = 4
@@ -76,7 +76,7 @@ model = Model(dataset)
 dataset_wangyi = DatasetByWangyi(num_classes)
 dataset_wangyi.set_Batch_Size(train_batch_List, val_batch_size)
 myhistory = historyByWangyi()
-
+wangyiOpt = OptimizerByWangyi()
 '''
 清理h5文件
 '''
@@ -98,7 +98,7 @@ model_cnn = Net(num_classes=num_classes)
 model_cnn.model_cnn.summary()
 
 model_cnn.model_cnn.compile(loss='categorical_crossentropy',
-              optimizer=OptimizerByWangyi().get_create_optimizer(name='adam', lr_num=1e-3),
+              optimizer=wangyiOpt.get_create_optimizer(name='adam', lr_num=1e-3),
               metrics=['accuracy']
               )
 
@@ -138,7 +138,7 @@ for epoch in range(train_epoch):
     # print('np.sum(train_batch_List :',np.sum(train_batch_List))
     for_fit_generator_train_steps = int(np.sum(train_batch_List, axis=0) * 2 / args.BATCH)
     print('该epoch的fit_generator steps是 ', for_fit_generator_train_steps)
-    history_train = model_cnn.get_Model().fit_generator(
+    history_train = model_cnn.model_cnn.fit_generator(
         generator=data_iter_train,
         steps_per_epoch=for_fit_generator_train_steps,
         validation_data=(x_4, y_4),
@@ -217,7 +217,7 @@ for epoch in range(train_epoch):
     '''
     4/ 调整学习率和优化模型
     '''
-    tmp_opt = OptimizerByWangyi().reduce_lr_by_loss_and_epoch(history_train.history['loss'][0],epoch)
+    tmp_opt = wangyiOpt.reduce_lr_by_loss_and_epoch(history_train.history['loss'][0],epoch)
 
     # 应用新的学习率
     if tmp_opt is not None:
@@ -235,6 +235,25 @@ for epoch in range(train_epoch):
     '''
     5/ 冻结训练层
     '''
+
+    '''
+    # construct a plot that plots and saves the training history
+    N = np.arange(0, epoch)
+    plt.style.use("ggplot")
+    plt.figure()
+    plt.plot(N, history_train_all.history['loss'], label="train_loss")
+    plt.plot(N, history_train_all.history['val_loss'], label="val_loss")
+    plt.plot(N, history_train_all.history['acc'], label="train_acc")
+    plt.plot(N, history_train_all.history['val_acc'], label="val_acc")
+    plt.title("Training Loss and Accuracy")
+    plt.xlabel("Epoch #")
+    plt.ylabel("Loss/Accuracy")
+    plt.legend(loc="lower left")
+    plt.savefig(args["plot"])
+    '''
+
+
+
 
 print('best_score_by_acc :%.4f' % best_score_by_acc)
 print('best_score_by_loss :%.4f' % best_score_by_loss)
