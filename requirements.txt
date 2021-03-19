@@ -3,7 +3,7 @@ numpy
 opencv-python
 matplotlib
 scipy
-Pillow==6.2.2
+Pillow==8.1.1
 tensorflow-gpu==1.14.0
 keras==2.2.5
 psutil
